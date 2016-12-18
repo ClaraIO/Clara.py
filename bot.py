@@ -16,6 +16,6 @@ admins = (
 )
 
 token = utils.config.get('Discord', 'Token', fallback=None)
-client = Bot(utils.config.get('Discord', 'Prefix', fallback=">"), admins)
+client = Bot(utils.config.get('Discord', 'Prefix', fallback="!"), admins)
 client.gather_cogs()
 client.run(token)

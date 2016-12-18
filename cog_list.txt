@@ -1,1 +1,2 @@
 cogs.example
+cogs.ex_menu

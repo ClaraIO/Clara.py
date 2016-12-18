@@ -184,56 +184,7 @@ class Paginator:
 			
 	def get_menu(self, bot, channel, user):
 		return Menu(bot, channel, user, *self.pages)
-		
-class EventMenu:
-	def __init__(self, bot, channel, user, return_on_none=True, timeout=60):
-		self.bot = bot
-		self.channel = channel
-		self.user = user
-		self.return_on_none = return_on_none
-		
-		self.events = {}
-		self.embed = Embed()
-		# example of `events`:
-		# {"\N{SOME EMOJI}": "func_name"}
-		
-	async def no_reaction(self):
-		await self.bot.delete_message(self.message)
-		
-	async def on_reaction(self):
-		pass
-		
-	async def start(self):
-		# Check Bot permissions
-		if not self.channel.permissions_for(self.channel.server.me).add_reactions:
-			raise Exception("Not allowed to add reactions or not given manage_messages")
-		if not self.channel.permissions_for(self.channel.server.me).manage_messages:
-			raise Exception("Not allowed to add reactions or not given manage_messages")
-		# Bot can add and remove reactions
-	
-		# Send initial message
-		self.message = await self.bot.send_message(self.channel, embed=self.embed)
-		
-		# Send initial arrows
-		for e in self.events.keys():
-			await self.bot.add_reaction(self.message, e)
-			await self.bot.add_reaction(self.message, e)
-		
-		while True:
-			react = await self.bot.wait_for_reaction(self.events.keys(), message=self.message, user=self.user, timeout=self.timeout)
-			await self.bot.remove_reaction(message, reaction.emoji, react.user)
-			if react is None:
-				await self.no_reaction()
-				if self.return_on_none:
-					return
-			reaction = react.reaction
-			message = reaction.message
-			if message.id == self.message.id:
-				if reaction.emoji in self.events:
-					with utils.discard:
-						await getattr(self, self.events[reaction.emoji])
-				await self.on_reaction()
-		
+
 class Menu:
 	def __init__(self, bot, channel, user, *pages):
 		self.bot = bot
