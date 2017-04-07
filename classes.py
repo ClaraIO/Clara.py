@@ -87,7 +87,7 @@ class Command:
     @asyncio.coroutine
     def run(self, message):
         """ Does type checking for command arguments """
-        if self.has != '':
+        if self.has != '':  # Checks if the user has a certain perm
             if (getattr(message.channel.permissions_for(message.author),
                         self.has) is False and
                     message.author.id not in self.cog.bot.admins):
@@ -249,7 +249,7 @@ class Menu:
         await self.bot.add_reaction(self.message, "\u2B05")  # Arrow Left
         await self.bot.add_reaction(self.message, "\u27A1")  # Arrow Right
 
-        while True:  # Loop for a bit, line 258 will get us out of here
+        while True:  # Loop for a bit, line 259 will get us out of here
             react = await self.bot.wait_for_reaction(["\u2B05", "\u27A1"],
                                                      message=self.message,
                                                      user=self.user,
@@ -359,6 +359,7 @@ class Bot(discord.Client):
             if hasattr(c, "on_message"):
                 await c.on_message(m)
 
+        # Ignore other bots
         if m.author.bot:
             return
 
@@ -367,6 +368,7 @@ class Bot(discord.Client):
             if m.author.id not in self.admins:
                 return
 
+        # Ignore this shitcode
         rawm = m
         m = m.content
 
