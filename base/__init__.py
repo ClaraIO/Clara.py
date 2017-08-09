@@ -29,7 +29,9 @@ from .converters import Converter
 from .ctx import Context
 from .exceptions import FrameworkException, SyntaxError  # noqa pylint: disable=redefined-builtin
 from .holders import CommandHolder
-from .translations import Translation
+from .translations import LocaleEngine
 
-__all__ = ["command", "Command", "Bot", "Cog", "Converter", "Context",
-           "FrameworkException", "SyntaxError", "CommandHolder", "Translation"]
+__all__ = [
+    "command", "Command", "Bot", "Cog", "Converter", "Context",
+    "FrameworkException", "SyntaxError", "CommandHolder", "LocaleEngine"
+]

@@ -23,28 +23,19 @@ Written by Martmists <legal@martmists.com>, August 2017
 """
 
 
-import re
-
-_SyntaxError = SyntaxError
+import json
 
 from .exceptions import SyntaxError  # noqa: ignore=E402 pylint: disable=redefined-builtin,wrong-import-position
 
 
-__all__ = ["Translation", "SyntaxError"]
+__all__ = ["LocaleEngine", "SyntaxError"]
 
 
-class Translation:
+class LocaleEngine:
     """
     Handles translation data
-    Translation data format:
-
-    welcome.en_us="Welcome to {guild}, I hope you enjoy your stay!"
-    welcome.nl_nl="Welkom in {guild}, Ik hoop dat je je hier vermaakt!"
-
-
+    Translation data format in JSON
     """
-    patt = re.compile(r'(?P<key>[^\.]+)\.(?P<language>[^=]+)='
-                      r'"(?P<translation>[^"]+)"')
 
     def __init__(self, filename):
         self.data = {}
@@ -57,25 +48,11 @@ class Translation:
     def reload(self):
         """ Reloads data from the translation file """
 
-        data = {}
-
         try:
             with open(self.filename) as f:
-                for lineno, line in enumerate(f.readlines()):
-                    if not line.strip():
-                        continue
+                data = json.load(f)
 
-                    m = self.patt.match(line)
-                    if not m:
-                        raise _SyntaxError
-
-                    key = m.group("key")
-                    lang = m.group("language")
-                    text = m.group("translation")
-                    data[f"{key}.{lang}"] = text
-
-        except _SyntaxError:
-            del data
+        except json.JSONDecodeError:
             raise SyntaxError("Invalid translation format on line "
                               f"{lineno}: {line}")
 
