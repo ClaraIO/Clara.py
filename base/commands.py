@@ -1,5 +1,5 @@
 """
-Copyright (C) 2017 Martmists
+Copyright (C) 2017 ClaraIO
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
@@ -19,14 +19,14 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-Written by Martmists <legal@martmists.com>, August 2017
+Written by ClaraIO <chinodesuuu@gmail.com>, August 2017
 """
 
 import inspect
 
 from .holders import CommandHolder
 from .converters import Converter
-from .translations import Translation
+from .translations import LocaleEngine
 
 
 __all__ = ["command", "Command"]
@@ -49,7 +49,7 @@ class Command:
         self.pass_ctx = kwargs.get("pass_context") or True
         self.subcommands = CommandHolder()
         if "translation_file" in kwargs:
-            self.translation = Translation(kwargs.get("translation_file"))
+            self.translation = LocaleEngine(kwargs.get("translation_file"))
         kwargs.get("bot").add_command(self)
 
     async def invoke(self, context):
