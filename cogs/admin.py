@@ -45,6 +45,10 @@ class Code(Cog):
         self._ = out
 
         res = ""
+
+        if inp.startswith("_ = "):
+            inp = inp[4:]
+
         for i, line in enumerate(inp.split("\n")):
             if i == 0:
                 s = f"In [{self.ln}]: "
@@ -57,20 +61,25 @@ class Code(Cog):
         if out is None:
             return (res, None)
 
-        res += f"Out [{self.ln}]: "
+        res += f"Out[{self.ln}]: "
 
         if isinstance(out, discord.Embed):
             res += "<Embed>"
             res = (res, out)
 
         else:
-            if out.startswith("Traceback (most recent call last):\n"):
-                out = "\n".join(out.split("\n")[1:])
+            if (isinstance(out, str) and
+                    out.startswith("Traceback (most recent call last):\n")):
+                out = "\n"+"\n".join(out.split("\n")[1:])
 
             pretty = (pprint.pformat(out) if not isinstance(out, str)
                       else str(out))
             if pretty != str(out):
                 res += "\n"
+
+            if pretty.count("\n") > 20:
+                l = pretty.split("\n")
+                pretty = "\n".join(l[:3]) + "\n ...\n" + "\n".join(l[-3:])
 
             res += pretty
             res = (res, None)
@@ -101,7 +110,7 @@ class Code(Cog):
 
         # Ignore this shitcode, it works
         _code = """
-async def func(self):
+async def func():
     old_locals = locals().copy()
     try:
 {}
@@ -122,18 +131,18 @@ async def func(self):
 """.format(textwrap.indent(code, '        '))
 
         try:
-            exec(code, self.env)  # pylint: disable=exec-used
+            exec(_code, self.env)  # pylint: disable=exec-used
             func = self.env['func']
-            res = await func(self, self.env)
+            res = await func()
 
         except:  # noqa pylint: disable=bare-except
             res = traceback.format_exc()
 
-        out, embed = self._format(_code, res)
+        out, embed = self._format(code, res)
         await ctx.send(f"```py\n{out}```", embed=embed)
 
     @command()
-    @check(lambda ctx: ctx.author.id in settings.owners)
+#    @check(lambda ctx: ctx.author.id in settings.admins)
     async def eval(self, ctx, *, code):
         code = code.strip("`")
         if code.startswith("py\n"):
@@ -146,9 +155,6 @@ async def func(self):
             code = "_ = "+code
 
         await self._eval(ctx, code)
-
-    def _reset_ln(self):
-        self.ln = 0
 
 
 def setup(bot):

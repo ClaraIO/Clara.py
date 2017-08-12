@@ -24,6 +24,7 @@ Written by ClaraIO <chinodesuuu@gmail.com>, August 2017
 
 import importlib
 import inspect
+import traceback
 
 from discord import Client
 
@@ -132,4 +133,11 @@ class Bot(Client):
             send=message.channel.send
         )
 
-        return await _command.invoke(context)
+        try:
+            await _command.invoke(context)
+
+        except Exception as e:  # noqa pylint: disable=broad-except
+            await self.command_error(context, e)
+
+    async def command_error(self, ctx, e):
+        await ctx.send("```py\n{}```".format(traceback.format_exc()))

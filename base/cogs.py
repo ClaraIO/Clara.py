@@ -38,6 +38,7 @@ class Cog:
         self.bot = bot
         for _, comm in inspect.getmembers(
                 self, lambda v: isinstance(v, Command)):
+            comm.set_cog(self)
             bot.add_command(comm)
 
     def _unload(self):

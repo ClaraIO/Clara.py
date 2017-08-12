@@ -52,9 +52,13 @@ class CheckFunc:
         self.callable = callable
 
     def __call__(self, ctx, *args, **kwargs):
+        print(ctx, args, kwargs)
+        if args:
+            kwargs['self'] = ctx
+            ctx = args[0]
         try:
             if self.callable(ctx):
-                return self.func(ctx, *args, **kwargs)
+                return self.func(ctx=ctx, *args, **kwargs)
 
             else:
                 raise
@@ -78,6 +82,10 @@ class Command:
             self.translation = LocaleEngine(kwargs.get("translation_file"))
         if kwargs.get("bot") is not None:
             kwargs['bot'].add_command(self)
+        self.cog = None
+
+    def set_cog(self, cog):
+        self.cog = cog
 
     async def invoke(self, context):
         """ Run the command or optionally subcommands """
@@ -97,9 +105,11 @@ class Command:
 
         for i, arg in enumerate(func_args):
             if arg.name == "self":
+                args.insert(0, None)  # dummy value
+                kwarg_data['self'] = self.cog
                 continue
 
-            if arg.name == "*":
+            if arg.kind.value == 3:
                 args[i] = " ".join(args[i:])
                 del args[i+1:]
 
@@ -117,13 +127,15 @@ class Command:
                     inst = arg.annotation()
                 kwarg_data[arg.name] = inst.convert(args[i], context)
 
-        @property
-        def has_subcommands(self):  # pylint: disable=unused-variable
-            """ Returns true if the command has subcommands """
-            return bool(self.subcommands.commands)
+        await self.func(**kwarg_data)
 
-        def subcommand(self, **kwargs):  # pylint: disable=unused-variable
-            """ Creates a subcommand for the command
-            Used as decorator
-            """
-            return command(bot=self, **kwargs)
+    @property
+    def has_subcommands(self):  # pylint: disable=unused-variable
+        """ Returns true if the command has subcommands """
+        return bool(self.subcommands.commands)
+
+    def subcommand(self, **kwargs):  # pylint: disable=unused-variable
+        """ Creates a subcommand for the command
+        Used as decorator
+        """
+        return command(bot=self, **kwargs)
