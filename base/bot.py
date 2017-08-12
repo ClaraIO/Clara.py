@@ -75,6 +75,13 @@ class Bot(Client):
             self._cogs[cog_name]._unload()
             del self._cogs[cog_name]
 
+    def add_command(self, command):
+        """ Add a command dynamically """
+        if command.name in self._commands.commands:
+            raise FrameworkException("Command already registered!")
+
+        self._commands.add_command(command)
+
     def remove_command(self, command_name):
         """ Remove a command dynamically """
         if command_name in self._commands.commands:

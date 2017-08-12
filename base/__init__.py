@@ -22,7 +22,7 @@ SOFTWARE.
 Written by ClaraIO <chinodesuuu@gmail.com>, August 2017
 """
 
-from .commands import command, Command
+from .commands import command, Command, check
 from .bot import Bot
 from .cogs import Cog
 from .converters import Converter
@@ -32,6 +32,6 @@ from .holders import CommandHolder
 from .translations import LocaleEngine
 
 __all__ = [
-    "command", "Command", "Bot", "Cog", "Converter", "Context",
+    "command", "Command", "Bot", "Cog", "Converter", "Context", "check",
     "FrameworkException", "SyntaxError", "CommandHolder", "LocaleEngine"
 ]

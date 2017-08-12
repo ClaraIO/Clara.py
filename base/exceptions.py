@@ -34,3 +34,8 @@ class FrameworkException(Exception):
 class SyntaxError(Exception):  # pylint: disable=redefined-builtin
     """ Raised when the Translation parsing fails """
     pass
+
+
+class CheckFailed(Exception):
+    """ Called when a command check fails """
+    pass

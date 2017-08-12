@@ -27,9 +27,10 @@ import inspect
 from .holders import CommandHolder
 from .converters import Converter
 from .translations import LocaleEngine
+from .exceptions import CheckFailed
 
 
-__all__ = ["command", "Command"]
+__all__ = ["command", "Command", "check"]
 
 
 def command(bot=None, **kwargs):
@@ -39,18 +40,44 @@ def command(bot=None, **kwargs):
     return decorator
 
 
+def check(callable):
+    def decorator(func):
+        return CheckFunc(func, callable)
+    return decorator
+
+
+class CheckFunc:
+    def __init__(self, func, callable):
+        self.func = func
+        self.callable = callable
+
+    def __call__(self, ctx, *args, **kwargs):
+        try:
+            if self.callable(ctx):
+                return self.func(ctx, *args, **kwargs)
+
+            else:
+                raise
+        except:  # noqa pylint: disable=bare-except
+            raise CheckFailed
+
+
 class Command:
     """ Command dataclass """
     def __init__(self, **kwargs):
-        self.func = kwargs['func']
-        self.sig = inspect.signature(self.func)
-        self.name = kwargs.get("name") or self.func.name
+        func = kwargs['func']
+        self.func = func
+        while isinstance(func, CheckFunc):
+            func = func.func
+        self.sig = inspect.signature(func)
+        self.name = kwargs.get("name") or func.__name__
         self.aliases = kwargs.get("aliases") or []
         self.pass_ctx = kwargs.get("pass_context") or True
         self.subcommands = CommandHolder()
         if "translation_file" in kwargs:
             self.translation = LocaleEngine(kwargs.get("translation_file"))
-        kwargs.get("bot").add_command(self)
+        if kwargs.get("bot") is not None:
+            kwargs['bot'].add_command(self)
 
     async def invoke(self, context):
         """ Run the command or optionally subcommands """

@@ -30,7 +30,8 @@ import traceback
 
 import discord
 
-from base import Cog, command
+from base import Cog, command, check
+import settings
 
 
 class Code(Cog):
@@ -78,6 +79,12 @@ class Code(Cog):
 
     async def _eval(self, ctx, code):
         self.ln += 1
+
+        if code.startswith("exit"):
+            self.ln = 0
+            self.env = {}
+            return await ctx.send(f"```Reset history!```")
+
         env = {
             "message": ctx.message,
             "author": ctx.message.author,
@@ -126,13 +133,15 @@ async def func(self):
         await ctx.send(f"```py\n{out}```", embed=embed)
 
     @command()
+    @check(lambda ctx: ctx.author.id in settings.owners)
     async def eval(self, ctx, *, code):
         code = code.strip("`")
         if code.startswith("py\n"):
             code = "\n".join(code.split("\n")[1:])
 
         if not re.search(  # Check if it's an expression
-                r"^(return|import|for|while|def|class|from|[a-zA-Z0-9]+\s*=)",
+                r"^(return|import|for|while|def|class|"
+                r"from|exit|[a-zA-Z0-9]+\s*=)",
                 code, re.M) and len(code.split("\n")) == 1:
             code = "_ = "+code
 

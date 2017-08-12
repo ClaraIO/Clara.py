@@ -27,7 +27,7 @@ import os
 from base import Bot
 import settings
 
-bot = Bot(translation_file="translations")
+bot = Bot(prefix="karen ", translation_file="translations")
 
 for f in os.listdir("cogs"):
     if f.endswith(".py"):

@@ -33,6 +33,9 @@ class CommandHolder:
     def __init__(self):
         self.commands = []
 
+    def __contains__(self, command_name):
+        return any(command_name in x['invokes'] for x in self.commands)
+
     def add_command(self, command):
         """ Registers a command """
         self.commands.append({
