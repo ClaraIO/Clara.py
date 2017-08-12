@@ -31,6 +31,6 @@ bot = Bot(translation_file="translations")
 
 for f in os.listdir("cogs"):
     if f.endswith(".py"):
-        bot.load_cog(f"cogs/{f}")
+        bot.load_cog(f"cogs.{f[:-3]}")
 
 bot.run(settings.token)
