@@ -4,7 +4,7 @@ jobs:
   build:
     docker:
      # we'll be using the clara.py image
-      - image: chinodesuuu/ci-clara.py:latest
+      - image: chinodesuuu/ci-amethyst:latest
     working_directory: ~/Clara.py
     steps:
       - checkout
