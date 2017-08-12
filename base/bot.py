@@ -61,6 +61,14 @@ class Bot(Client):
         lib.setup(self)
         del lib
 
+    def add_cog(self, cog):
+        cog_name = cog.__class__.__name__
+
+        if cog_name in self._cogs:
+            raise FrameworkException("Cog already registered!")
+
+        self._cogs[cog_name] = cog
+
     def unload_cog(self, cog_name):
         """ Unload a code from the cog classname """
         if cog_name in self._cogs:

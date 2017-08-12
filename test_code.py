@@ -20,7 +20,7 @@ def test_pylint():
 
     proc = subprocess.Popen(("pylint --disable=relative-beyond-top-level,"
                              "too-few-public-methods,protected-access,"
-                             "invalid-name"
+                             "invalid-name,missing-docstring"
                              " cogs base utils").split(),
                             stdout=subprocess.PIPE,
                             stderr=subprocess.PIPE)
