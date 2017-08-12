@@ -1,3 +1,4 @@
+"""
 Copyright (C) 2017 ClaraIO
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -19,3 +20,21 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 Written by ClaraIO <chinodesuuu@gmail.com>, August 2017
+"""
+
+
+__all__ = ["Converter"]
+
+
+class Converter:
+    """
+    Put converters as annotations to convert. If given, annotations must be
+    callables, classes with one argument or inherit from this class.
+    """
+    def __init__(self, *args, **kwargs):
+        self.args = args
+        self.kwargs = kwargs
+
+    def convert(self, arg, ctx):  # pylint: disable=no-self-use,unused-argument
+        """ Converts argument, default class returns the argument itself. """
+        return arg

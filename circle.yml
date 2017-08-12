@@ -1,0 +1,14 @@
+# Clara.py - CircleCI File for CI
+version: 2
+jobs:
+  build:
+    docker:
+     # we'll be using the clara.py image
+      - image: chinodesuuu/ci-clara.py:latest
+    working_directory: ~/Clara.py
+    steps:
+      - checkout
+      - run:
+          command: pip install flake8 pylint pytest
+      - run:
+          command: pytest

@@ -1,3 +1,4 @@
+"""
 Copyright (C) 2017 ClaraIO
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -19,3 +20,40 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 Written by ClaraIO <chinodesuuu@gmail.com>, August 2017
+"""
+
+
+import json
+
+from .exceptions import SyntaxError  # noqa: ignore=E402 pylint: disable=redefined-builtin,wrong-import-position
+
+
+__all__ = ["LocaleEngine", "SyntaxError"]
+
+
+class LocaleEngine:
+    """
+    Handles translation data
+    Translation data format in JSON
+    """
+
+    def __init__(self, filename):
+        self.data = {}
+        self.filename = filename
+        self.reload()
+
+    def __getattr__(self, item):
+        return self.data[item]
+
+    def reload(self):
+        """ Reloads data from the translation file """
+
+        try:
+            with open(self.filename) as f:
+                data = json.load(f)
+
+        except json.JSONDecodeError:
+            raise SyntaxError("Invalid JSON in translation file!")
+
+        else:
+            self.data = data  # noqa: ignore=F821

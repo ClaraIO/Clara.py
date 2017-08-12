@@ -1,3 +1,4 @@
+"""
 Copyright (C) 2017 ClaraIO
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -19,3 +20,40 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 Written by ClaraIO <chinodesuuu@gmail.com>, August 2017
+"""
+
+
+__all__ = ["CommandHolder"]
+
+
+class CommandHolder:
+    """ DONT USE THIS CLASS YOURSELF!
+    This is a holder class used by the Bot class, and should never be
+    used manually."""
+    def __init__(self):
+        self.commands = []
+
+    def add_command(self, command):
+        """ Registers a command """
+        self.commands.append({
+            "invokes": [command.name] + command.aliases,
+            "command": command,
+            "subcommands": command.subcommands
+        })
+
+    def get_command(self, name):
+        """ Returns a command """
+        for command in self.commands:
+            if name in command["invokes"]:
+                return command["command"]
+
+        return False
+
+    def remove_command(self, name):
+        """ Removes a command """
+        for i, command in enumerate(self.commands):
+            if name in command["invokes"]:
+                del self.commands[i]
+                return True
+
+        return False

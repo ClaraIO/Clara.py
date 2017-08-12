@@ -1,3 +1,4 @@
+"""
 Copyright (C) 2017 ClaraIO
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -19,3 +20,17 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 Written by ClaraIO <chinodesuuu@gmail.com>, August 2017
+"""
+
+
+__all__ = ["FrameworkException", "SyntaxError"]
+
+
+class FrameworkException(Exception):
+    """ Raised when something fails within the framework """
+    pass
+
+
+class SyntaxError(Exception):  # pylint: disable=redefined-builtin
+    """ Raised when the Translation parsing fails """
+    pass

@@ -1,3 +1,4 @@
+"""
 Copyright (C) 2017 ClaraIO
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -19,3 +20,27 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 Written by ClaraIO <chinodesuuu@gmail.com>, August 2017
+"""
+
+
+import inspect
+
+from .commands import Command
+
+
+__all__ = ["Cog"]
+
+
+class Cog:
+    """ Cogs must inherit from this """
+
+    def __init__(self, bot):
+        self.bot = bot
+        for _, comm in inspect.getmembers(
+                self, lambda v: isinstance(v, Command)):
+            bot.add_command(comm)
+
+    def _unload(self):
+        for _, comm in inspect.getmembers(
+                self, lambda v: isinstance(v, Command)):
+            self.bot.remove_command(comm)

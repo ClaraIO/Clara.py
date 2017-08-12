@@ -1,3 +1,4 @@
+"""
 Copyright (C) 2017 ClaraIO
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -19,3 +20,23 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 Written by ClaraIO <chinodesuuu@gmail.com>, August 2017
+"""
+
+
+__all__ = ["Context"]
+
+
+class Context:
+    """ Contains data about the current command and environment """
+    def __init__(self, **kwargs):
+        self.kwargs = kwargs
+
+    def __hasattr__(self, key):
+        return key in self.kwargs
+
+    def __getattr__(self, key):
+        return self.kwargs[key]
+
+    def update(self, d):
+        """ Update contents of the context after init """
+        self.kwargs.update(d)
