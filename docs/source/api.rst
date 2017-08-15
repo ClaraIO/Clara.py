@@ -1,4 +1,4 @@
-.. currentmodule:: Karen
+.. currentmodule:: base
 
 .. autoclass:: Bot
     :members:
