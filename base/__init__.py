@@ -27,11 +27,13 @@ from .bot import Bot
 from .cogs import Cog
 from .converters import Converter
 from .ctx import Context
-from .exceptions import FrameworkException, SyntaxError  # noqa pylint: disable=redefined-builtin
+from .exceptions import (FrameworkException, SyntaxError,  # noqa pylint: disable=redefined-builtin
+                         CheckFailed, ConverterError)
 from .holders import CommandHolder
 from .translations import LocaleEngine
 
 __all__ = [
     "command", "Command", "Bot", "Cog", "Converter", "Context", "check",
-    "FrameworkException", "SyntaxError", "CommandHolder", "LocaleEngine"
+    "FrameworkException", "SyntaxError", "CommandHolder", "LocaleEngine",
+    "CheckFailed", "ConverterError"
 ]

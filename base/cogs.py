@@ -36,12 +36,15 @@ class Cog:
 
     def __init__(self, bot):
         self.bot = bot
+
+        # Register all the cog's commands
         for _, comm in inspect.getmembers(
                 self, lambda v: isinstance(v, Command)):
             comm.set_cog(self)
             bot.add_command(comm)
 
     def _unload(self):
+        # Unregister all the cog's commands
         for _, comm in inspect.getmembers(
                 self, lambda v: isinstance(v, Command)):
             self.bot.remove_command(comm)

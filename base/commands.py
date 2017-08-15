@@ -40,30 +40,11 @@ def command(bot=None, **kwargs):
     return decorator
 
 
-def check(callable):
-    def decorator(func):
-        return CheckFunc(func, callable)
+def check(_callable):
+    def decorator(comm):
+        comm.checks.append(_callable)
+        return comm
     return decorator
-
-
-class CheckFunc:
-    def __init__(self, func, callable):
-        self.func = func
-        self.callable = callable
-
-    def __call__(self, ctx, *args, **kwargs):
-        print(ctx, args, kwargs)
-        if args:
-            kwargs['self'] = ctx
-            ctx = args[0]
-        try:
-            if self.callable(ctx):
-                return self.func(ctx=ctx, *args, **kwargs)
-
-            else:
-                raise
-        except:  # noqa pylint: disable=bare-except
-            raise CheckFailed
 
 
 class Command:
@@ -71,8 +52,6 @@ class Command:
     def __init__(self, **kwargs):
         func = kwargs['func']
         self.func = func
-        while isinstance(func, CheckFunc):
-            func = func.func
         self.sig = inspect.signature(func)
         self.name = kwargs.get("name") or func.__name__
         self.aliases = kwargs.get("aliases") or []
@@ -82,51 +61,79 @@ class Command:
             self.translation = LocaleEngine(kwargs.get("translation_file"))
         if kwargs.get("bot") is not None:
             kwargs['bot'].add_command(self)
+        self.checks = []
         self.cog = None
 
     def set_cog(self, cog):
         self.cog = cog
+
+    def do_check(self, _check, ctx):  # pylint: disable=no-self-use
+        """ Run a check on the ctx """
+        try:
+            assert _check(ctx)
+
+        except Exception as e:  # noqa pylint: disable=broad-except
+            raise CheckFailed(e)
 
     async def invoke(self, context):
         """ Run the command or optionally subcommands """
         args = context.args
 
         if self.has_subcommands and args[0] in self.subcommands.commands:  # noqa pylint: disable=no-member
+            # The command's subcommand is called, invoke that
             comm = self.subcommands.get_command(args.pop(0))
             context.update({"invoked_subcommand": comm})
             return await comm.invoke(context)
 
+        # Run checks
+        for _check in self.checks:
+            self.do_check(_check, context)
+
+        # Get the function arguments
         func_args = self.sig.parameters.values()
 
         if self.pass_ctx:
+            # pass ctx
             args.insert(0, context)
 
         kwarg_data = {}
 
         for i, arg in enumerate(func_args):
+            # Iterate over the function arguments
+
             if arg.name == "self":
                 args.insert(0, None)  # dummy value
                 kwarg_data['self'] = self.cog
                 continue
 
-            if arg.kind.value == 3:
+            if arg.kind.value == 3:  # keyword-only
+                # Consume rest
                 args[i] = " ".join(args[i:])
                 del args[i+1:]
 
             if arg.annotation == arg.empty:
+                # No annotation, don't convert
                 kwarg_data[arg.name] = args[i]
 
             elif (inspect.isfunction(arg.annotation) or
                   (inspect.isclass(arg.annotation) and not
                    issubclass(arg.annotation, Converter))):
+                # The annotation is a callable/class, but not a Converter
                 kwarg_data[arg.name] = arg.annotation(args[i])
 
             elif (isinstance(type(arg.annotation), Converter) or
                   inspect.isclass(arg.annotation)):
                 if inspect.isclass(arg.annotation):
+                    # It's a class, instantiate it with no args
                     inst = arg.annotation()
+                else:
+                    # Already an instance
+                    inst = arg.annotation
+
+                # Simply convert using the converter's `convert` method
                 kwarg_data[arg.name] = inst.convert(args[i], context)
 
+        # Run the function using the arguments collected
         await self.func(**kwarg_data)
 
     @property

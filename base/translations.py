@@ -25,7 +25,7 @@ Written by ClaraIO <chinodesuuu@gmail.com>, August 2017
 
 import json
 
-from .exceptions import SyntaxError  # noqa: ignore=E402 pylint: disable=redefined-builtin,wrong-import-position
+from .exceptions import SyntaxError  # noqa: ignore=E402 pylint: disable=redefined-builtin
 
 
 __all__ = ["LocaleEngine", "SyntaxError"]
@@ -53,6 +53,7 @@ class LocaleEngine:
                 data = json.load(f)
 
         except json.JSONDecodeError:
+            # Don't save the data if the JSON is invalid.
             raise SyntaxError("Invalid JSON in translation file!")
 
         else:

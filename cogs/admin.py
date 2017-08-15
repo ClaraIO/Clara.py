@@ -72,8 +72,8 @@ class Code(Cog):
                     out.startswith("Traceback (most recent call last):\n")):
                 out = "\n"+"\n".join(out.split("\n")[1:])
 
-            pretty = (pprint.pformat(out) if not isinstance(out, str)
-                      else str(out))
+            pretty = (pprint.pformat(out, compact=True, width=60) if
+                      not isinstance(out, str) else str(out))
             if pretty != str(out):
                 res += "\n"
 
@@ -141,8 +141,8 @@ async def func():
         out, embed = self._format(code, res)
         await ctx.send(f"```py\n{out}```", embed=embed)
 
+    @check(lambda ctx: ctx.author.id in settings.admins)
     @command()
-#    @check(lambda ctx: ctx.author.id in settings.admins)
     async def eval(self, ctx, *, code):
         code = code.strip("`")
         if code.startswith("py\n"):

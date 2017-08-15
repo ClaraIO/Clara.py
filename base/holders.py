@@ -29,7 +29,8 @@ __all__ = ["CommandHolder"]
 class CommandHolder:
     """ DONT USE THIS CLASS YOURSELF!
     This is a holder class used by the Bot class, and should never be
-    used manually."""
+    used manually.
+    """
     def __init__(self):
         self.commands = []
 

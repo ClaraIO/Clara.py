@@ -22,6 +22,11 @@ SOFTWARE.
 Written by ClaraIO <chinodesuuu@gmail.com>, August 2017
 """
 
+import re
+
+
+from .exceptions import ConverterError
+
 
 __all__ = ["Converter"]
 
@@ -38,3 +43,42 @@ class Converter:
     def convert(self, arg, ctx):  # pylint: disable=no-self-use,unused-argument
         """ Converts argument, default class returns the argument itself. """
         return arg
+
+
+class MentionConverter(Converter):
+    patt = re.compile("<(?P<type>[#@])(?P<subtype>[!&])?(?P<id>[0-9]{16,18})>")
+
+    def convert(self, arg, ctx):
+        mat = self.patt.match(arg)
+
+        if mat is None:
+            raise ConverterError("Invalid Argument")
+
+        typ, subtyp, _id = mat.groups()
+        _id = int(_id)
+
+        subtyp = None if subtyp != "!" else None
+
+        if typ == "@":
+            if subtyp == "&":
+                # it's a role
+                retval = [r for r in ctx.guild.roles if r.id == _id]
+
+            elif subtyp is None:
+                # it's a member
+                retval = [m for m in ctx.guild.members if m.id == _id]
+
+            else:
+                raise ConverterError("Invalid Argument")
+
+        else:
+            # it's a channel
+            retval = [c for c in ctx.guild.channels if c.id == _id]
+
+        try:
+            ret = retval[0]
+
+        except IndexError:
+            raise ConverterError("Invalid Argument")
+
+        return ret

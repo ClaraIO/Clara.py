@@ -27,7 +27,21 @@ __all__ = ["Context"]
 
 
 class Context:
-    """ Contains data about the current command and environment """
+    """ Contains data about the current command and environment.
+
+    `message`: [discord.Message] - The message for this command
+    `author`: [discord.User | discord.Member] - The sender of the message
+        is a discord.User if the message was sent in DMs
+    `channel`: [discord.Channel] - The current channel
+    `guild`: [discord.Guild] - The current guild
+    `command`: [base.Command] - The command invoked
+    `bot`: [base.Bot] - The bot
+    `invoker`: [str] - The alias used for this command
+    `args`: [List[str]] - The arguments used in the message
+    `send`: [Coroutine] - Sends a message to the channel it was sent in
+        See the discord.py `Messageable.send` docs
+
+    """
     def __init__(self, **kwargs):
         self.kwargs = kwargs
 

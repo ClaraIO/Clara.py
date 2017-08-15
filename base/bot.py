@@ -76,12 +76,12 @@ class Bot(Client):
             self._cogs[cog_name]._unload()
             del self._cogs[cog_name]
 
-    def add_command(self, command):
+    def add_command(self, _command):
         """ Add a command dynamically """
-        if command.name in self._commands.commands:
+        if _command.name in self._commands.commands:
             raise FrameworkException("Command already registered!")
 
-        self._commands.add_command(command)
+        self._commands.add_command(_command)
 
     def remove_command(self, command_name):
         """ Remove a command dynamically """
@@ -102,6 +102,9 @@ class Bot(Client):
         else:
             prefix = self.prefix
 
+        if inspect.isawaitable(prefix):
+            prefix = await prefix
+
         if isinstance(prefix, str):
             prefix = [prefix]
 
@@ -109,10 +112,15 @@ class Bot(Client):
             return False
 
         for p in prefix:
+            # Check for any prefix
             if message.content.startswith(p):
                 content = message.content[len(p):]
                 break
 
+        else:
+            return False
+
+        # TODO: Custom parsing for quoted content
         args = [_.strip()for _ in content.split()]
 
         _command = self._commands.get_command(args[0])
@@ -121,6 +129,7 @@ class Bot(Client):
             # Command not found
             return False
 
+        # Build the context
         context = Context(
             message=message,
             author=message.author,
@@ -139,5 +148,5 @@ class Bot(Client):
         except Exception as e:  # noqa pylint: disable=broad-except
             await self.command_error(context, e)
 
-    async def command_error(self, ctx, e):
+    async def command_error(self, ctx, e):  # pylint: disable=unused-argument
         await ctx.send("```py\n{}```".format(traceback.format_exc()))
