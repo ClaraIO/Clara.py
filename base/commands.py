@@ -135,7 +135,7 @@ class Command:
                     kwarg_data[arg.name] = inst.convert(args[i], context)
 
             except IndexError:
-                if arg.default == arg.empty:
+                if arg.default != arg.empty:
                     continue
                 raise FrameworkException(f"Missing argument: {arg.name}!")
 
