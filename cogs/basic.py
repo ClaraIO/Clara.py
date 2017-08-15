@@ -41,7 +41,7 @@ class Basic(Cog):
     async def _help(self, ctx, _command: str = None):
         """ Send information about the bot or help on a command """
         if _command is None or self.bot.get_command(_command) is None:
-            await ctx.send(help_text.format(ctx))
+            return await ctx.send(help_text.format(ctx))
 
         comm = self.bot.get_command(_command)
 
