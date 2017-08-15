@@ -29,16 +29,20 @@ from base import Cog, command
 class Modules(Cog):
     @command(pass_context=False)
     def load(self, cog: str):
+        """ Loads a cog by dotted path """
         self.bot.load_cog(cog)
 
     @command(pass_context=False)
     def unload(self, cog: str):
+        """ Unloads a cog by cog class name """
         self.bot.unload_cog(cog)
 
     @command(pass_context=False)
     def reload(self, cog: str):
+        """ Reloads a cog by cog class name """
+        file = self.bot._cogs[cog].__module__
         self.bot.unload_cog(cog)
-        self.bot.load_cog(cog)
+        self.bot.load_cog(file)
 
 
 def setup(bot):
