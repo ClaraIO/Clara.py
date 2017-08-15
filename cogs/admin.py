@@ -53,7 +53,9 @@ class Code(Cog):
         if inp.startswith("_ = "):
             inp = inp[4:]
 
-        lines = [l for l in inp.split("\n") if l.strip()] + [""]
+        lines = [l for l in inp.split("\n") if l.strip()]
+        if len(lines) != 1:
+            lines += [""]
 
         # Create the inpit dialog
         for i, line in enumerate(lines):
