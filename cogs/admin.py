@@ -53,8 +53,10 @@ class Code(Cog):
         if inp.startswith("_ = "):
             inp = inp[4:]
 
+        lines = [l for l in inp.split("\n") if l.strip()] + [""]
+
         # Create the inpit dialog
-        for i, line in enumerate(inp.split("\n")):
+        for i, line in enumerate(lines):
             if i == 0:
                 s = f"In [{self.ln}]: "
 
@@ -62,20 +64,23 @@ class Code(Cog):
                 # Indent the 3 dots correctly
                 s = (f"{{:<{len(str(self.ln))+2}}}...: ").format("")
 
-            if i == inp.count("\n"):
+            if i == len(lines)-2:
                 if line.startswith("return"):
                     line = line[6:].strip()
 
             res += s + line + "\n"
 
+        self.stdout.seek(0)
+        text = self.stdout.read()
+        self.stdout.close()
+        self.stdout = io.StringIO()
+
+        if text:
+            res += text + "\n"
+
         if out is None:
             # No output, return the input statement
             return (res, None)
-
-        text = self.stdout.read()
-        self.stdout.flush()
-
-        res += text + "\n"
 
         res += f"Out[{self.ln}]: "
 
@@ -90,7 +95,8 @@ class Code(Cog):
                 # Leave out the traceback message
                 out = "\n"+"\n".join(out.split("\n")[1:])
 
-            pretty = pprint.pformat(out, compact=True, width=60)
+            pretty = (pprint.pformat(out, compact=True, width=60) if not
+                      isinstance(out, str) else str(out))
 
             if pretty != str(out):
                 # We're using the pretty version, start on the next line
@@ -124,7 +130,8 @@ class Code(Cog):
             "self": self,
             "bot": self.bot,
             "inspect": inspect,
-            "discord": discord
+            "discord": discord,
+            "contextlib": contextlib
         }
 
         self.env.update(env)
@@ -132,30 +139,21 @@ class Code(Cog):
         # Ignore this shitcode, it works
         _code = """
 async def func():
-    old_locals = locals().copy()
     try:
+        with contextlib.redirect_stdout(self.stdout):
 {}
-        new_locals = {{k:v for k,v in locals().items()
-                       if (k not in old_locals and
-                           k not in ['old_locals','_','func'])}}
-        if new_locals != {{}}:
-            return new_locals
-        else:
-            if '_' in locals() and inspect.isawaitable(_):
+        if '_' in locals():
+            if inspect.isawaitable(_):
                 _ = await _
             return _
     finally:
-        self.env.update({{k:v for k,v in locals().items()
-                          if (k not in old_locals and
-                              k not in ['old_locals','_','new_locals','func'])
-                        }})
-""".format(textwrap.indent(code, '        '))
+        self.env.update(locals())
+""".format(textwrap.indent(code, '            '))
 
         try:
             exec(_code, self.env)  # pylint: disable=exec-used
             func = self.env['func']
-            with contextlib.redirect_stdout(self.stdout):
-                res = await func()
+            res = await func()
 
         except:  # noqa pylint: disable=bare-except
             res = traceback.format_exc()

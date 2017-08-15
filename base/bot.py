@@ -121,7 +121,7 @@ class Bot(Client):
             return False
 
         # TODO: Custom parsing for quoted content
-        args = [_.strip()for _ in content.split()]
+        args = [_ for _ in content.split(" ")]
 
         _command = self._commands.get_command(args[0])
 
