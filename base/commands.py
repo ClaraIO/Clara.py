@@ -27,7 +27,7 @@ import inspect
 from .holders import CommandHolder
 from .converters import Converter
 from .translations import LocaleEngine
-from .exceptions import CheckFailed
+from .exceptions import CheckFailed, FrameworkException
 
 
 __all__ = ["command", "Command", "check"]
@@ -75,7 +75,7 @@ class Command:
         except Exception as e:  # noqa pylint: disable=broad-except
             raise CheckFailed(e)
 
-    async def invoke(self, context):
+    async def invoke(self, context):  # pylint: disable=too-many-branches
         """ Run the command or optionally subcommands """
         args = context.args
 
@@ -106,32 +106,38 @@ class Command:
                 kwarg_data['self'] = self.cog
                 continue
 
-            if arg.kind.value == 3:  # keyword-only
-                # Consume rest
-                args[i] = " ".join(args[i:])
-                del args[i+1:]
+            try:
+                if arg.kind.value == 3:  # keyword-only
+                    # Consume rest
+                    args[i] = " ".join(args[i:])
+                    del args[i+1:]
 
-            if arg.annotation == arg.empty:
-                # No annotation, don't convert
-                kwarg_data[arg.name] = args[i]
+                if arg.annotation == arg.empty:
+                    # No annotation, don't convert
+                    kwarg_data[arg.name] = args[i]
 
-            elif (inspect.isfunction(arg.annotation) or
-                  (inspect.isclass(arg.annotation) and not
-                   issubclass(arg.annotation, Converter))):
-                # The annotation is a callable/class, but not a Converter
-                kwarg_data[arg.name] = arg.annotation(args[i])
+                elif (inspect.isfunction(arg.annotation) or
+                      (inspect.isclass(arg.annotation) and not
+                       issubclass(arg.annotation, Converter))):
+                    # The annotation is a callable/class, but not a Converter
+                    kwarg_data[arg.name] = arg.annotation(args[i])
 
-            elif (isinstance(type(arg.annotation), Converter) or
-                  inspect.isclass(arg.annotation)):
-                if inspect.isclass(arg.annotation):
-                    # It's a class, instantiate it with no args
-                    inst = arg.annotation()
-                else:
-                    # Already an instance
-                    inst = arg.annotation
+                elif (isinstance(type(arg.annotation), Converter) or
+                      inspect.isclass(arg.annotation)):
+                    if inspect.isclass(arg.annotation):
+                        # It's a class, instantiate it with no args
+                        inst = arg.annotation()
+                    else:
+                        # Already an instance
+                        inst = arg.annotation
 
-                # Simply convert using the converter's `convert` method
-                kwarg_data[arg.name] = inst.convert(args[i], context)
+                    # Simply convert using the converter's `convert` method
+                    kwarg_data[arg.name] = inst.convert(args[i], context)
+
+            except IndexError:
+                if arg.default == arg.empty:
+                    continue
+                raise FrameworkException(f"Missing argument: {arg.name}!")
 
         # Run the function using the arguments collected
         await self.func(**kwarg_data)

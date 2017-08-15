@@ -22,18 +22,27 @@ SOFTWARE.
 Written by ClaraIO <chinodesuuu@gmail.com>, August 2017
 """
 
-from .commands import command, Command, check
-from .bot import Bot
-from .cogs import Cog
-from .converters import Converter, MentionConverter
-from .ctx import Context
-from .exceptions import (FrameworkException, SyntaxError,  # noqa pylint: disable=redefined-builtin
-                         CheckFailed, ConverterError)
-from .holders import CommandHolder
-from .translations import LocaleEngine
 
-__all__ = [
-    "command", "Command", "Bot", "Cog", "Converter", "Context", "check",
-    "FrameworkException", "SyntaxError", "CommandHolder", "LocaleEngine",
-    "CheckFailed", "ConverterError", "MentionConverter"
-]
+import discord
+
+from base import Cog, command, check, MentionConverter
+
+
+class Moderation(Cog):
+    @check(lambda ctx: ctx.permissions_for(ctx.author).ban_members)
+    @command(pass_context=False)
+    async def ban(self, member: MentionConverter(discord.Member),
+                  *, reason: str = "No reason given."):
+        """ Bans a member with an optional given reason """
+        await member.ban(reason=reason)
+
+    @check(lambda ctx: ctx.permissions_for(ctx.author).kick_members)
+    @command(pass_context=False)
+    async def kick(self, member: MentionConverter(discord.Member),
+                   *, reason: str = "No reason given."):
+        """ Bans a member with an optional given reason """
+        await member.kick(reason=reason)
+
+
+def setup(bot):
+    bot.add_cog(Moderation(bot))

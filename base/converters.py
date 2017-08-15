@@ -46,7 +46,27 @@ class Converter:
 
 
 class MentionConverter(Converter):
+    """
+    Converts mentions to objects.
+
+    Accepted types in __init__:
+        discord.Member
+        discord.Channel
+        discord.Role
+
+    Checking is done with regex
+    """
     patt = re.compile("<(?P<type>[#@])(?P<subtype>[!&])?(?P<id>[0-9]{16,18})>")
+
+    def __init__(self, typ=None):
+        self.typ = typ
+        super().__init__()
+
+    def check_type(self, arg):
+        if self.typ is None:
+            return True
+
+        return isinstance(arg, self.typ)
 
     def convert(self, arg, ctx):
         mat = self.patt.match(arg)
@@ -81,4 +101,8 @@ class MentionConverter(Converter):
         except IndexError:
             raise ConverterError("Invalid Argument")
 
-        return ret
+        if self.check_type(ret):
+            return ret
+
+        else:
+            raise ConverterError("Invalid Argument")
