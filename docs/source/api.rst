@@ -1,5 +1,9 @@
 .. currentmodule:: base
 
+
+Main Classes
+----------
+
 .. autoclass:: Bot
     :members:
 
