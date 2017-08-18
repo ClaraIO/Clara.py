@@ -29,9 +29,13 @@ __all__ = ["CommandHolder"]
 class CommandHolder:
     """ DONT USE THIS CLASS YOURSELF!
     This is a holder class used by the Bot class, and should never be
-    used manually."""
+    used manually.
+    """
     def __init__(self):
         self.commands = []
+
+    def __contains__(self, command_name):
+        return any(command_name in x['invokes'] for x in self.commands)
 
     def add_command(self, command):
         """ Registers a command """

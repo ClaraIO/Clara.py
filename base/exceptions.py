@@ -23,7 +23,8 @@ Written by ClaraIO <chinodesuuu@gmail.com>, August 2017
 """
 
 
-__all__ = ["FrameworkException", "SyntaxError"]
+__all__ = ["FrameworkException", "SyntaxError",
+           "CheckFailed", "ConverterError"]
 
 
 class FrameworkException(Exception):
@@ -33,4 +34,14 @@ class FrameworkException(Exception):
 
 class SyntaxError(Exception):  # pylint: disable=redefined-builtin
     """ Raised when the Translation parsing fails """
+    pass
+
+
+class CheckFailed(Exception):
+    """ Raised when a command check fails """
+    pass
+
+
+class ConverterError(Exception):
+    """ Raised when a converter errors """
     pass

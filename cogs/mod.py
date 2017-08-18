@@ -1,5 +1,5 @@
 """
-Copyright (C) 2017 Martmists
+Copyright (C) 2017 ClaraIO
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
@@ -19,18 +19,32 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-Written by Martmists <legal@martmists.com>, August 2017
+Written by ClaraIO <chinodesuuu@gmail.com>, August 2017
 """
 
-import os
 
-from base import Bot
-import settings
+import discord
 
-bot = Bot(prefix=settings.prefix, translation_file="translations")
+from base import Cog, command, has_permission, MentionConverter
 
-for f in os.listdir("cogs"):
-    if f.endswith(".py"):
-        bot.load_cog(f"cogs.{f[:-3]}")
 
-bot.run(settings.token)
+class Moderation(Cog):
+    @has_permission(ban_members=True)
+    @command(pass_context=False)
+    async def ban(self, member: MentionConverter(discord.Member),
+                  *, reason: str = "No reason given."):
+        """ Bans a member with an optional given reason """
+
+        await member.ban(reason=reason)
+
+    @has_permission(ban_members=True)
+    @command(pass_context=False)
+    async def kick(self, member: MentionConverter(discord.Member),
+                   *, reason: str = "No reason given."):
+        """ Bans a member with an optional given reason """
+        print(member)
+        await member.kick(reason=reason)
+
+
+def setup(bot):
+    bot.add_cog(Moderation(bot))

@@ -3,12 +3,21 @@ version: 2
 jobs:
   build:
     docker:
-     # we'll be using the clara.py image
+      # we'll be using the clara.py image
       - image: chinodesuuu/ci-amethyst:latest
     working_directory: ~/Clara.py
+
     steps:
       - checkout
+
+      # tests requirements
       - run:
           command: pip install flake8 pylint pytest
+
+      # dependancies
+      - run:
+          command: pip install https://github.com/rapptz/discord.py/archive/rewrite.zip
+
+      # run tests
       - run:
           command: pytest

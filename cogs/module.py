@@ -1,5 +1,5 @@
 """
-Copyright (C) 2017 Martmists
+Copyright (C) 2017 ClaraIO
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
@@ -19,7 +19,31 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-Written by Martmists <legal@martmists.com>, August 2017
+Written by ClaraIO <chinodesuuu@gmail.com>, August 2017
 """
 
-token = "abc"
+
+from base import Cog, command
+
+
+class Modules(Cog):
+    @command(pass_context=False)
+    def load(self, cog: str):
+        """ Loads a cog by dotted path """
+        self.bot.load_cog(cog)
+
+    @command(pass_context=False)
+    def unload(self, cog: str):
+        """ Unloads a cog by cog class name """
+        self.bot.unload_cog(cog)
+
+    @command(pass_context=False)
+    def reload(self, cog: str):
+        """ Reloads a cog by cog class name """
+        file = self.bot._cogs[cog].__module__
+        self.bot.unload_cog(cog)
+        self.bot.load_cog(file)
+
+
+def setup(bot):
+    bot.add_cog(Modules(bot))

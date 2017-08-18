@@ -22,29 +22,39 @@ SOFTWARE.
 Written by ClaraIO <chinodesuuu@gmail.com>, August 2017
 """
 
-
-import inspect
-
-from .commands import Command
+from base import Cog, command
 
 
-__all__ = ["Cog"]
+# TODO: Translations (cc @Enra @Cameron)
+help_text = """Hello! I'm {0.bot.user}.
+I'm written in Python using the ClaraIO/Karen framework.
+
+For a list of commands, use `{0.bot.prefix}commands`
+For more information on a command, use `{0.bot.prefix}help <command name>`
+
+Github: https://github.com/ClaraIO/Karen
+Support: https://discord.gg/rmMTZue"""
 
 
-class Cog:
-    """ Cogs must inherit from this """
+class Basic(Cog):
+    @command(name="help")
+    async def _help(self, ctx, _command: str = None):
+        """ Send information about the bot or help on a command """
+        if _command is None or self.bot.get_command(_command) is None:
+            return await ctx.send(help_text.format(ctx))
 
-    def __init__(self, bot):
-        self.bot = bot
+        comm = self.bot.get_command(_command)
 
-        # Register all the cog's commands
-        for _, comm in inspect.getmembers(
-                self, lambda v: isinstance(v, Command)):
-            comm.set_cog(self)
-            bot.add_command(comm)
+        # TODO: @property on command that utilizes the signature
+        await ctx.send(comm.func.__doc__)
 
-    def _unload(self):
-        # Unregister all the cog's commands
-        for _, comm in inspect.getmembers(
-                self, lambda v: isinstance(v, Command)):
-            self.bot.remove_command(comm)
+    @command()
+    async def commands(self, ctx):
+        """ Returns a list of commands """
+        commands = [c['invokes'][0] for c in self.bot._commands.commands]
+        commlist = ", ".join(commands)
+        await ctx.send(f"My commands: {commlist}")
+
+
+def setup(bot):
+    bot.add_cog(Basic(bot))

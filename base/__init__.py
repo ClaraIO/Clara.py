@@ -23,15 +23,19 @@ Written by ClaraIO <chinodesuuu@gmail.com>, August 2017
 """
 
 from .commands import command, Command
+from .checks import check, has_permission, bot_has_permission
 from .bot import Bot
 from .cogs import Cog
-from .converters import Converter
+from .converters import Converter, MentionConverter
 from .ctx import Context
-from .exceptions import FrameworkException, SyntaxError  # noqa pylint: disable=redefined-builtin
+from .exceptions import (FrameworkException, SyntaxError,  # noqa pylint: disable=redefined-builtin
+                         CheckFailed, ConverterError)
 from .holders import CommandHolder
 from .translations import LocaleEngine
 
 __all__ = [
-    "command", "Command", "Bot", "Cog", "Converter", "Context",
-    "FrameworkException", "SyntaxError", "CommandHolder", "LocaleEngine"
+    "command", "Command", "Bot", "Cog", "Converter", "Context", "check",
+    "FrameworkException", "SyntaxError", "CommandHolder", "LocaleEngine",
+    "CheckFailed", "ConverterError", "MentionConverter",
+    "has_permission", "bot_has_permission"
 ]

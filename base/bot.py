@@ -24,6 +24,7 @@ Written by ClaraIO <chinodesuuu@gmail.com>, August 2017
 
 import importlib
 import inspect
+import traceback
 
 from discord import Client
 
@@ -61,11 +62,26 @@ class Bot(Client):
         lib.setup(self)
         del lib
 
+    def add_cog(self, cog):
+        cog_name = cog.__class__.__name__
+
+        if cog_name in self._cogs:
+            raise FrameworkException("Cog already registered!")
+
+        self._cogs[cog_name] = cog
+
     def unload_cog(self, cog_name):
         """ Unload a code from the cog classname """
         if cog_name in self._cogs:
             self._cogs[cog_name]._unload()
             del self._cogs[cog_name]
+
+    def add_command(self, _command):
+        """ Add a command dynamically """
+        if _command.name in self._commands.commands:
+            raise FrameworkException("Command already registered!")
+
+        self._commands.add_command(_command)
 
     def remove_command(self, command_name):
         """ Remove a command dynamically """
@@ -86,6 +102,9 @@ class Bot(Client):
         else:
             prefix = self.prefix
 
+        if inspect.isawaitable(prefix):
+            prefix = await prefix
+
         if isinstance(prefix, str):
             prefix = [prefix]
 
@@ -93,11 +112,16 @@ class Bot(Client):
             return False
 
         for p in prefix:
+            # Check for any prefix
             if message.content.startswith(p):
                 content = message.content[len(p):]
                 break
 
-        args = [_.strip()for _ in content.split()]
+        else:
+            return False
+
+        # TODO: Custom parsing for quoted content
+        args = [_ for _ in content.split(" ")]
 
         _command = self._commands.get_command(args[0])
 
@@ -105,6 +129,7 @@ class Bot(Client):
             # Command not found
             return False
 
+        # Build the context
         context = Context(
             message=message,
             author=message.author,
@@ -117,4 +142,11 @@ class Bot(Client):
             send=message.channel.send
         )
 
-        return await _command.invoke(context)
+        try:
+            await _command.invoke(context)
+
+        except Exception as e:  # noqa pylint: disable=broad-except
+            await self.command_error(context, e)
+
+    async def command_error(self, ctx, e):  # pylint: disable=unused-argument
+        await ctx.send("```py\n{}```".format(traceback.format_exc()))
