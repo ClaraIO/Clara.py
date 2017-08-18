@@ -2,7 +2,7 @@
 
 
 Main Classes
-----------
+------------
 
 .. autoclass:: Bot
     :members:
@@ -13,16 +13,30 @@ Main Classes
 .. autoclass:: Cog
     :members:
 
-.. autoclass:: Converter
-    :members:
-
-.. autoclass:: MentionConverter
-    :members:
-
 .. autoclass:: Context
     :members:
 
 .. autoclass:: LocaleEngine
+    :members:
+
+
+Checks
+------
+
+.. autofunction:: check
+
+.. autofunction:: has_permission
+
+.. autofunction:: bot_has_permission
+
+
+Converters
+----------
+
+.. autoclass:: Converter
+    :members:
+
+.. autoclass:: MentionConverter
     :members:
 
 

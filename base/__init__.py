@@ -22,7 +22,8 @@ SOFTWARE.
 Written by ClaraIO <chinodesuuu@gmail.com>, August 2017
 """
 
-from .commands import command, Command, check
+from .commands import command, Command
+from .checks import check, has_permission, bot_has_permission
 from .bot import Bot
 from .cogs import Cog
 from .converters import Converter, MentionConverter
@@ -35,5 +36,6 @@ from .translations import LocaleEngine
 __all__ = [
     "command", "Command", "Bot", "Cog", "Converter", "Context", "check",
     "FrameworkException", "SyntaxError", "CommandHolder", "LocaleEngine",
-    "CheckFailed", "ConverterError", "MentionConverter"
+    "CheckFailed", "ConverterError", "MentionConverter",
+    "has_permission", "bot_has_permission"
 ]

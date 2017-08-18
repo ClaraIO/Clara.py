@@ -3,7 +3,7 @@ import re
 
 
 def test_flake8():
-    proc = subprocess.Popen("flake8", stdout=subprocess.PIPE)
+    proc = subprocess.Popen("flake8 --exclude=docs", stdout=subprocess.PIPE)
 
     proc.wait()
 

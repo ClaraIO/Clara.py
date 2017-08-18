@@ -16,7 +16,7 @@ jobs:
 
       # dependancies
       - run:
-          command: pip install discord
+          command: pip install https://github.com/rapptz/discord.py/archive/rewrite.zip
 
       # run tests
       - run:

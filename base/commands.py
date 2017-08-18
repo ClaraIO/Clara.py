@@ -30,20 +30,13 @@ from .translations import LocaleEngine
 from .exceptions import CheckFailed, FrameworkException
 
 
-__all__ = ["command", "Command", "check"]
+__all__ = ["command", "Command"]
 
 
 def command(bot=None, **kwargs):
     """ Command creation decorator when not using @bot.command """
     def decorator(func):  # pylint: disable=missing-docstring
         return Command(func=func, bot=bot, **kwargs)
-    return decorator
-
-
-def check(_callable):
-    def decorator(comm):
-        comm.checks.append(_callable)
-        return comm
     return decorator
 
 
@@ -55,7 +48,7 @@ class Command:
         self.sig = inspect.signature(func)
         self.name = kwargs.get("name") or func.__name__
         self.aliases = kwargs.get("aliases") or []
-        self.pass_ctx = kwargs.get("pass_context") or True
+        self.pass_ctx = kwargs.get("pass_context", True)
         self.subcommands = CommandHolder()
         if "translation_file" in kwargs:
             self.translation = LocaleEngine(kwargs.get("translation_file"))
@@ -67,13 +60,13 @@ class Command:
     def set_cog(self, cog):
         self.cog = cog
 
-    def do_check(self, _check, ctx):  # pylint: disable=no-self-use
+    def _do_check(self, _check, ctx):  # pylint: disable=no-self-use
         """ Run a check on the ctx """
         try:
             assert _check(ctx)
 
         except Exception as e:  # noqa pylint: disable=broad-except
-            raise CheckFailed(e)
+            raise e from CheckFailed
 
     async def invoke(self, context):  # pylint: disable=too-many-branches
         """ Run the command or optionally subcommands """
@@ -87,7 +80,7 @@ class Command:
 
         # Run checks
         for _check in self.checks:
-            self.do_check(_check, context)
+            self._do_check(_check, context)
 
         # Get the function arguments
         func_args = self.sig.parameters.values()
@@ -122,7 +115,7 @@ class Command:
                     # The annotation is a callable/class, but not a Converter
                     kwarg_data[arg.name] = arg.annotation(args[i])
 
-                elif (isinstance(type(arg.annotation), Converter) or
+                elif (isinstance(arg.annotation, Converter) or
                       inspect.isclass(arg.annotation)):
                     if inspect.isclass(arg.annotation):
                         # It's a class, instantiate it with no args
@@ -134,9 +127,12 @@ class Command:
                     # Simply convert using the converter's `convert` method
                     kwarg_data[arg.name] = inst.convert(args[i], context)
 
+                else:
+                    raise FrameworkException("Invalid type annotation!")
+
             except IndexError:
                 if arg.default != arg.empty:
-                    continue
+                    break
                 raise FrameworkException(f"Missing argument: {arg.name}!")
 
         # Run the function using the arguments collected

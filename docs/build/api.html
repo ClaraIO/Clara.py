@@ -91,6 +91,8 @@
             
               <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Main Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#checks">Checks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#converters">Converters</a></li>
 <li class="toctree-l1"><a class="reference internal" href="#exceptions">Exceptions</a></li>
 </ul>
 
@@ -212,12 +214,6 @@ make sure to call process_commands</p>
 <dt id="base.Command">
 <em class="property">class </em><code class="descclassname">base.</code><code class="descname">Command</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#base.Command" title="Permalink to this definition">¶</a></dt>
 <dd><p>Command dataclass</p>
-<dl class="method">
-<dt id="base.Command.do_check">
-<code class="descname">do_check</code><span class="sig-paren">(</span><em>_check</em>, <em>ctx</em><span class="sig-paren">)</span><a class="headerlink" href="#base.Command.do_check" title="Permalink to this definition">¶</a></dt>
-<dd><p>Run a check on the ctx</p>
-</dd></dl>
-
 <dl class="attribute">
 <dt id="base.Command.has_subcommands">
 <code class="descname">has_subcommands</code><a class="headerlink" href="#base.Command.has_subcommands" title="Permalink to this definition">¶</a></dt>
@@ -243,32 +239,6 @@ Used as decorator</p>
 <dt id="base.Cog">
 <em class="property">class </em><code class="descclassname">base.</code><code class="descname">Cog</code><span class="sig-paren">(</span><em>bot</em><span class="sig-paren">)</span><a class="headerlink" href="#base.Cog" title="Permalink to this definition">¶</a></dt>
 <dd><p>Cogs must inherit from this</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="base.Converter">
-<em class="property">class </em><code class="descclassname">base.</code><code class="descname">Converter</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#base.Converter" title="Permalink to this definition">¶</a></dt>
-<dd><p>Put converters as annotations to convert. If given, annotations must be
-callables, classes with one argument or inherit from this class.</p>
-<dl class="method">
-<dt id="base.Converter.convert">
-<code class="descname">convert</code><span class="sig-paren">(</span><em>arg</em>, <em>ctx</em><span class="sig-paren">)</span><a class="headerlink" href="#base.Converter.convert" title="Permalink to this definition">¶</a></dt>
-<dd><p>Converts argument, default class returns the argument itself.</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="base.MentionConverter">
-<em class="property">class </em><code class="descclassname">base.</code><code class="descname">MentionConverter</code><span class="sig-paren">(</span><em>typ=None</em><span class="sig-paren">)</span><a class="headerlink" href="#base.MentionConverter" title="Permalink to this definition">¶</a></dt>
-<dd><p>Converts mentions to objects.</p>
-<dl class="docutils">
-<dt>Accepted types in __init__:</dt>
-<dd>discord.Member
-discord.Channel
-discord.Role</dd>
-</dl>
-<p>Checking is done with regex</p>
 </dd></dl>
 
 <dl class="class">
@@ -307,6 +277,53 @@ Translation data format in JSON</p>
 <dd><p>Reloads data from the translation file</p>
 </dd></dl>
 
+</dd></dl>
+
+</div>
+<div class="section" id="checks">
+<h1>Checks<a class="headerlink" href="#checks" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="base.check">
+<code class="descclassname">base.</code><code class="descname">check</code><span class="sig-paren">(</span><em>_callable</em><span class="sig-paren">)</span><a class="headerlink" href="#base.check" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="base.has_permission">
+<code class="descclassname">base.</code><code class="descname">has_permission</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#base.has_permission" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="base.bot_has_permission">
+<code class="descclassname">base.</code><code class="descname">bot_has_permission</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#base.bot_has_permission" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="converters">
+<h1>Converters<a class="headerlink" href="#converters" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="base.Converter">
+<em class="property">class </em><code class="descclassname">base.</code><code class="descname">Converter</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#base.Converter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Put converters as annotations to convert. If given, annotations must be
+callables, classes with one argument or inherit from this class.</p>
+<dl class="method">
+<dt id="base.Converter.convert">
+<code class="descname">convert</code><span class="sig-paren">(</span><em>arg</em>, <em>ctx</em><span class="sig-paren">)</span><a class="headerlink" href="#base.Converter.convert" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts argument, default class returns the argument itself.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="base.MentionConverter">
+<em class="property">class </em><code class="descclassname">base.</code><code class="descname">MentionConverter</code><span class="sig-paren">(</span><em>typ=None</em><span class="sig-paren">)</span><a class="headerlink" href="#base.MentionConverter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts mentions to objects.</p>
+<dl class="docutils">
+<dt>Accepted types in __init__:</dt>
+<dd>discord.Member
+discord.Channel
+discord.Role</dd>
+</dl>
+<p>Checking is done with regex</p>
 </dd></dl>
 
 </div>
