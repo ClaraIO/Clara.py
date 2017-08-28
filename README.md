@@ -1,3 +1,3 @@
 # Clara.py
 
-A python version of ClaraIO/Clara, maintained by Nobody as of now
+A python version of ClaraIO/Clara, maintained by Martmists
