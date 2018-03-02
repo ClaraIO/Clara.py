@@ -7,6 +7,7 @@ import discord
 import json
 import redis
 import k3
+import aiohttp
 
 # try to find JSON file
 try :
@@ -23,4 +24,13 @@ class Karen(discord.Client):
         self.config = config
         self.cmd_handler = k3.commands.CommandGroupMixin
         self.commands = self.cmd_handler
+        self.session = aiohttp.ClientSession()
+        self.cmd_help = None # TODO: Find out how k3 sends cmd helps
     
+    @client.event
+    async def on_ready(self):
+        app_info = await self.application_info()
+        
+        print(f"connected to Discord as {self.user.name}")
+        
+        
